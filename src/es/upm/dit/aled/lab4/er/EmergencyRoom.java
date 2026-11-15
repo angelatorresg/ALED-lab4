@@ -123,6 +123,7 @@ public class EmergencyRoom {
 	 * @param patient The Patient.
 	 */
 	public void admit(Patient patient) {
+		System.out.println("commit");
 		// TODO
 	}
 
