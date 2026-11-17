@@ -131,6 +131,10 @@ public class Patient extends Thread {
 	 */
 	private void advanceProtocol() {
 		// TODO
+		System.out.println("Paciente " + number + " está siendo desplazado desde " + location + " hasta " + protocol.get(indexProtocol).getTo());
+		EmergencyRoomGUI.getInstance().animateTransfer(this, protocol.get(indexProtocol));
+		location = protocol.get(indexProtocol).getTo();
+		indexProtocol++;
 	}
 
 	/**
@@ -140,6 +144,12 @@ public class Patient extends Thread {
 	 */
 	private void attendedAtLocation() {
 		// TODO
+		try {
+			System.out.println("Paciente " + number + " está siendo atendido en " + location);
+			Thread.sleep(location.getTime());
+		} catch (InterruptedException e) {
+			return;
+		}
 	}
 
 	/**
@@ -150,6 +160,13 @@ public class Patient extends Thread {
 	@Override
 	public void run() {
 		// TODO
+		while(indexProtocol < protocol.size()) {
+			attendedAtLocation();
+			advanceProtocol();
+		}
+		attendedAtLocation();
+		EmergencyRoomGUI.getInstance().removePatient(this);
+		System.out.println("Paciente " + number + " ha terminado su protocolo en " + location);
 	}
 
 }

@@ -1,8 +1,10 @@
 package es.upm.dit.aled.lab4.genome;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+
 
 /**
  * Callable task that performs a linear search over a specific section of a
@@ -32,6 +34,10 @@ public class FASTASearchCallable implements Callable<List<Integer>> {
 	 */
 	public FASTASearchCallable(FASTAReaderThreads reader, int lo, int hi, byte[] pattern) {
 		// TODO
+		this.reader = reader;
+		this.lo = lo;
+		this.hi = hi;
+		this.pattern = pattern;
 	}
 
 	/**
@@ -44,9 +50,20 @@ public class FASTASearchCallable implements Callable<List<Integer>> {
 	 */
 	@Override
 	public List<Integer> call() throws Exception {
-		// TODO
-		return null;
+		
+		List<Integer> sol = new ArrayList<>();
+		for(int i = lo; i < hi; i++) {
+			try {
+				if(compare(pattern, i)) { 
+					sol.add(i);
+				}
+			} catch(FASTAException e) {
+				break;
+			}
+		}
+		return sol;
 	}
+	
 
 	/*
 	 * Helper method that checks if a pattern appears at a specific position in the

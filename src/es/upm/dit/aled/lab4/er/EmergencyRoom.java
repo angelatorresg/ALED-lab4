@@ -123,8 +123,9 @@ public class EmergencyRoom {
 	 * @param patient The Patient.
 	 */
 	public void admit(Patient patient) {
-		System.out.println("commit");
 		// TODO
+		patient.start();
+		System.out.println("Paciente " + patient.getNumber() + " admitido");
 	}
 
 	/**
@@ -134,6 +135,12 @@ public class EmergencyRoom {
 	 */
 	public void waitForDischarge(Patient patient) {
 		// TODO
+		try {
+			patient.join();
+			System.out.println("Paciente " + patient.getNumber() + " dado de alta");
+		} catch (InterruptedException e) {
+			return;
+		}
 	}
 
 }

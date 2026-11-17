@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
 
 /**
  * Reads a FASTA file containing genetic information and allows for the search
@@ -116,7 +118,51 @@ public class FASTAReaderThreads {
 	 */
 	public List<Integer> search(byte[] pattern) {
 		// TODO
-		return null;
+		List<Integer> resultados = new ArrayList<>();
+		ExecutorService executor = null;
+		
+		try {
+			int cores = Runtime.getRuntime().availableProcessors();
+			int tareaSize = validBytes / cores;
+			int resto = validBytes % cores;
+			int lo = 0;
+			int hi = 0 + tareaSize;
+			
+			executor = Executors.newFixedThreadPool(cores);
+			
+			Future<List<Integer>>[] futuros = new Future[cores];
+			
+			for (int i = 0; i < cores; i++) {
+				
+				if(resto > 0) {
+					hi++;
+					resto--;
+				}
+				
+				FASTASearchCallable f = new FASTASearchCallable(this, lo, hi, pattern);
+				
+				lo = hi;
+				hi += tareaSize;
+				
+				futuros[i] = executor.submit(f);
+			}
+			
+			
+			for(Future<List<Integer>> f : futuros) {
+				resultados.addAll(f.get());
+			}
+			
+		} catch (Exception e) {
+			System.out.println("La tarea ha sido interrumpida: " + e.getMessage());
+			
+		} finally {
+			if( executor != null) {
+				executor.shutdown();
+			}
+			
+		}
+		return resultados;
+		
 	}
 
 	public static void main(String[] args) {
